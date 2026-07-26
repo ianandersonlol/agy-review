@@ -1,12 +1,8 @@
 # agy — adversarial review plugin
 
 Independent adversarial code review from Gemini via `agy` (Google Antigravity
-CLI), with **read access to your actual repository**.
+CLI)
 
-The distinguishing feature: the reviewer is not handed a pasted diff in
-isolation. It runs inside your repo and is explicitly instructed to grep for
-call sites, read changed files in full, and check whether the change breaks
-existing callers. That is the class of bug a paste-only reviewer cannot find.
 
 ## Usage
 
