@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agy-review",
+  "description": "Adversarial code review via agy (Google Antigravity CLI), with real repository access.",
+  "owner": {
+    "name": "Ian Anderson",
+    "url": "https://github.com/ianandersonlol"
+  },
+  "plugins": [
+    {
+      "name": "agy",
+      "description": "Adversarial code review via agy (Antigravity CLI) with real repo access.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
