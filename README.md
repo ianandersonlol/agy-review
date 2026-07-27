@@ -16,29 +16,52 @@ CLI)
 /agy:review --dry-run                  # what would be reviewed; spends no quota
 ```
 
-Or directly, outside Claude Code:
+Or directly, with no plugin machinery at all:
 
 ```bash
-bash /path/to/agy-review/scripts/agy-review.sh --base main
+bash /path/to/agy-review/skills/agy-review/scripts/agy-review.sh --base main
 ```
 
 ## Install
 
-Requires [`agy`](https://antigravity.google/) on `PATH` and OAuth-authenticated,
-plus `git`. No `coreutils`/`gtimeout` dependency — the script uses agy's own
+Works in **both Claude Code and Codex** from this one repo. Requires
+[`agy`](https://antigravity.google/) on `PATH` and OAuth-authenticated, plus
+`git`. No `coreutils`/`gtimeout` dependency — the script uses agy's own
 `--print-timeout`.
+
+**Claude Code** — adds the `/agy:review` slash command:
 
 ```bash
 claude plugin marketplace add ianandersonlol/agy-review
 claude plugin install agy@agy-review
 ```
 
-Then `/agy:review` in any git repository. To verify the wiring without spending
-any quota:
+**Codex** — adds the `agy-review` skill:
 
 ```bash
-/agy:review --dry-run
+codex plugin marketplace add ianandersonlol/agy-review
+codex plugin add agy@agy-review
 ```
+
+To verify the wiring without spending any quota, run `/agy:review --dry-run` in
+Claude Code, or ask Codex to "dry-run an agy review".
+
+### How one repo targets both
+
+| | Claude Code | Codex |
+|---|---|---|
+| Manifest | `.claude-plugin/plugin.json` | `.codex-plugin/plugin.json` |
+| Surface | `commands/review.md` → `/agy:review` | `skills/agy-review/SKILL.md`, model-invoked |
+| Script | `skills/agy-review/scripts/agy-review.sh` — **one copy, shared** |
+
+The script is the whole product and contains no harness-specific logic. It lives
+inside the skill directory because Codex skills resolve scripts by relative path
+and there is no `CODEX_PLUGIN_ROOT` equivalent; Claude Code reaches the same file
+through `${CLAUDE_PLUGIN_ROOT}`.
+
+Note the surfaces differ: Claude Code gets a slash command you type, Codex gets a
+skill the model invokes when you ask for a review in natural language. Same
+script, same output.
 
 ## Model choice
 
@@ -141,7 +164,8 @@ independent reviewer, honest output.
   not take effect until you reinstall:
   `claude plugin uninstall agy@<marketplace> && claude plugin install agy@<marketplace>`.
   Bump `version` in `plugin.json` if the cache looks stale. To iterate quickly,
-  run `scripts/agy-review.sh` directly instead — it needs no plugin machinery.
+  run `skills/agy-review/scripts/agy-review.sh` directly instead — it needs no
+  plugin machinery.
 - **agy print-mode quirk.** agy occasionally prefixes output with
   `MD Parse Error` and dumps the model's scratchpad before the real answer. The
   script detects this and warns on stderr rather than truncating — a heuristic

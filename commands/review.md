@@ -16,7 +16,7 @@ Arguments: $ARGUMENTS
 1. Run the review. Pass `$ARGUMENTS` straight through — the script parses them:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/agy-review.sh" $ARGUMENTS
+bash "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.sh" $ARGUMENTS
 ```
 
 2. Interpret the exit code before anything else:

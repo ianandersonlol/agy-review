@@ -1,0 +1,36 @@
+{
+  "name": "agy",
+  "version": "1.1.0",
+  "description": "Adversarial code review via agy (Google Antigravity CLI). Runs Gemini 3.6 Flash read-only against your actual repo so it can follow call sites, not just critique a pasted diff.",
+  "author": {
+    "name": "Ian Anderson",
+    "url": "https://github.com/ianandersonlol"
+  },
+  "homepage": "https://github.com/ianandersonlol/agy-review",
+  "license": "MIT",
+  "keywords": [
+    "agy",
+    "antigravity",
+    "gemini",
+    "review",
+    "adversarial",
+    "second-opinion"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "agy review",
+    "shortDescription": "Adversarial code review from Gemini, with real repo access",
+    "longDescription": "Delegates adversarial review of your current diff to Gemini 3.6 Flash via the agy (Antigravity) CLI. The reviewer runs read-only but with read access to the whole repository, so it greps for call sites and verifies findings against real code instead of critiquing a pasted diff \u2014 catching breakage in files the diff never touched. Includes a credential pre-flight, since the diff leaves your machine.",
+    "developerName": "Ian Anderson",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://github.com/ianandersonlol/agy-review",
+    "defaultPrompt": [
+      "Get an adversarial review of my current diff with agy",
+      "Have agy red-team this change before I merge it",
+      "Ask agy for a second opinion on the staged changes, focusing on auth"
+    ]
+  }
+}
