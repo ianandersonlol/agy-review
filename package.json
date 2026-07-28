@@ -1,0 +1,14 @@
+{
+  "name": "agy-review",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Adversarial code review via agy (Google Antigravity CLI).",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\""
+  }
+}

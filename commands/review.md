@@ -1,13 +1,16 @@
 ---
 description: Adversarial review of your working diff via agy (Gemini) with real repo access
 argument-hint: [--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]
-allowed-tools: Bash(bash:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
+allowed-tools: Bash(node:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
 ---
 
 Get an independent adversarial review of the current change from Gemini via `agy`.
 The reviewer runs **read-only** (`--mode plan --sandbox`) but has **read access to
 the whole repository**, so it verifies findings against real code and call sites
 instead of guessing from the diff.
+
+This is the **defect lens**: it hunts for what is broken. To challenge the design
+and approach instead, use `/agy:challenge`.
 
 Arguments: $ARGUMENTS
 
@@ -16,7 +19,7 @@ Arguments: $ARGUMENTS
 1. Run the review. Pass `$ARGUMENTS` straight through — the script parses them:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.sh" $ARGUMENTS
+node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $ARGUMENTS
 ```
 
 2. Interpret the exit code before anything else:
@@ -27,7 +30,8 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.sh" $ARGUMENTS
    - **3** — agy produced no output. The message names the class: `quota`
      (Antigravity limit hit), `auth` (re-run `agy` interactively to re-auth), or
      `empty_output`. Report it; do not retry in a loop.
-   - **2** — setup problem (not a git repo, bad ref, agy missing). Report it.
+   - **2** — setup problem (not a git repo, bad ref, agy missing). Suggest
+     `/agy:setup`, which diagnoses exactly what is wrong.
    - anything else — surface agy's stderr verbatim.
 
 3. Present the review to the user **verbatim first**, unedited. Do not soften,
@@ -65,3 +69,4 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.sh" $ARGUMENTS
   yourself. Do not try to build a panel inside this command.
 - Each run consumes Antigravity quota, which is shared with the desktop app and
   IDE. Prefer scoping large diffs with `-- <paths>` over reviewing everything.
+- `--dry-run` shows exactly what would be sent and spends no quota.
