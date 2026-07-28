@@ -1,6 +1,6 @@
 ---
 name: agy-review
-description: "Get an independent adversarial code review of the current diff from Gemini via the agy (Antigravity) CLI, with read access to the real repository so it verifies findings against actual call sites. Use when the user explicitly asks for a second opinion, an adversarial or independent review, a red-team pass, to poke holes in a change, or to check a risky diff before merging. Also covers challenging the design or approach of a change rather than its bugs, and checking that the agy toolchain is set up. Do not invoke unprompted on every change."
+description: "Delegate code review, design critique, or a fix to Gemini via the agy (Antigravity) CLI, which runs inside the real repository so it verifies claims against actual call sites rather than a pasted diff. Use when the user asks for an independent second opinion, an adversarial or red-team review, to poke holes in a change, or to check a risky diff before merging; to challenge the design or approach of a change rather than its bugs; or to check that the agy toolchain is set up. It ALSO covers handing agy a problem to fix, which EDITS FILES — invoke that only when the user explicitly asks for agy or Gemini to do the fixing, never as your own first resort for a bug you could fix yourself. Do not invoke unprompted on every change."
 ---
 
 # Adversarial review via agy (Gemini)
