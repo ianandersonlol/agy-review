@@ -404,15 +404,26 @@ async function commandSetup(options) {
     }`,
   );
   if (environment.agy.path) {
+    // "responds but unreadable" gets its own wording. Printing "0 available"
+    // would read as an empty account rather than as our own parser giving up.
+    const models = !environment.agy.responds
+      ? "did NOT respond"
+      : environment.agy.modelListUnreadable
+        ? "respond, but the list was not readable (display only — reviews unaffected)"
+        : `respond (${environment.agy.models.length} available)`;
     out.push(
-      `         models ${environment.agy.responds ? `respond (${environment.agy.models.length} available)` : "did NOT respond"}` +
+      `         models ${models}` +
         (environment.agy.defaultModelAvailable === false ? `; default ${MODEL_DEFAULT} is missing` : ""),
     );
   }
   out.push(`  platform  ${environment.platform}`);
 
   if (steps.length > 0) {
-    out.push("", "To fix:");
+    // A ready environment can still carry advisory steps — an unreadable model
+    // list, or a default model this build does not offer. Neither blocks a
+    // review, so printing them under "To fix:" beneath a "ready" headline reads
+    // as a contradiction. Same content, labelled for what it is.
+    out.push("", environment.ready ? "Notes:" : "To fix:");
     for (const step of steps) {
       out.push(`  - ${step.problem}`);
       out.push(`    ${step.fix}`);

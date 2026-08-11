@@ -29,7 +29,7 @@ export async function probeEnvironment({
 
   const agyPath = await findAgy();
   const version = agyPath ? await agyVersion(agyPath) : null;
-  const models = agyPath ? await agyModels(agyPath, modelsTimeout) : null;
+  const probe = agyPath ? await agyModels(agyPath, modelsTimeout) : null;
 
   const environment = {
     node: {
@@ -39,15 +39,7 @@ export async function probeEnvironment({
     },
     platform: process.platform,
     git: { path: gitPath, version: gitVersion, ok: Boolean(gitPath) },
-    agy: {
-      path: agyPath,
-      version,
-      // `responds` is deliberately not called `authenticated` — see agyModels.
-      responds: Array.isArray(models),
-      models,
-      defaultModelAvailable: Array.isArray(models) ? models.includes(MODEL_DEFAULT) : null,
-      ok: Boolean(agyPath) && Array.isArray(models),
-    },
+    agy: summariseAgy(agyPath, version, probe),
     repo: null,
   };
 
@@ -58,6 +50,37 @@ export async function probeEnvironment({
 
   environment.ready = environment.node.ok && environment.git.ok && environment.agy.ok;
   return environment;
+}
+
+/**
+ * Turn the raw agy probe into the reported facts. Pure, so the distinction it
+ * exists to keep can be tested.
+ *
+ * Readiness hangs on `responds` alone, never on how many models we managed to
+ * read out. Those were previously the same thing, and when agy changed its
+ * output format the plugin declared a working, authenticated install broken and
+ * sent the user off to redo an OAuth flow that was fine. A list we cannot read
+ * is a defect in this plugin, and reviews never consult the list at all.
+ */
+export function summariseAgy(agyPath, version, probe) {
+  const responds = Boolean(probe?.responded);
+  const models = responds ? probe.models : null;
+  // agy answered, but in a shape parseModelList did not recognise.
+  const modelListUnreadable = responds && probe.models.length === 0;
+  return {
+    path: agyPath,
+    version,
+    // `responds` is deliberately not called `authenticated` — see agyModels.
+    responds,
+    models,
+    modelListUnreadable,
+    // Why the probe came back as it did, when there is anything to say.
+    probeReason: probe?.reason ?? null,
+    // null means "unknown", and only an outright false is worth acting on: an
+    // unreadable list must not be read as "your default model is missing".
+    defaultModelAvailable: models?.length ? models.includes(MODEL_DEFAULT) : null,
+    ok: Boolean(agyPath) && responds,
+  };
 }
 
 /** Ordered, actionable remediation for whatever is not ready. */
@@ -84,10 +107,23 @@ export function remediation(environment) {
     });
   } else if (!environment.agy.responds) {
     steps.push({
-      problem: "agy is installed but `agy models` returned nothing.",
+      problem: environment.agy.probeReason
+        ? `agy is installed but did not answer: ${environment.agy.probeReason}.`
+        : "agy is installed but `agy models` returned nothing.",
       fix:
         "Usually authentication. Run `agy` once interactively to complete the " +
         "OAuth flow, then re-run this check. If that succeeds, quota may be exhausted.",
+    });
+  } else if (environment.agy.modelListUnreadable) {
+    // Not a readiness failure, and pointedly not an auth one: agy answered.
+    steps.push({
+      problem:
+        "agy answered, but this plugin could not read its model list — the output " +
+        "format has probably changed again. Reviews are unaffected; only this " +
+        "readiness display and the default-model check are.",
+      fix:
+        "Update the agy-review plugin. If it persists, run `agy models` and report " +
+        "its output at https://github.com/ianandersonlol/agy-review/issues.",
     });
   } else if (environment.agy.defaultModelAvailable === false) {
     steps.push({

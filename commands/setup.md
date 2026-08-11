@@ -18,7 +18,8 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup $ARG
 ```
 
 Exit **0** means ready, exit **2** means something needs fixing. The output
-already contains a per-component status and an ordered remediation list.
+already contains a per-component status and an ordered remediation list, headed
+`To fix:` when it blocks and `Notes:` when the toolchain is ready anyway.
 
 2. Present the output. If everything is ready, keep it to a line or two — do not
    pad a clean result.
@@ -38,6 +39,13 @@ already contains a per-component status and an ordered remediation list.
      session, complete the sign-in, and re-run `/agy:setup`. If that succeeds
      and the check still fails, quota is the next suspect.
 
+   - **models respond but the list was not readable.** Not an install problem
+     and *not* an auth problem — agy answered, and this plugin failed to read the
+     format. Reviews are unaffected, because the review path never consults the
+     model list. Say exactly that, suggest updating the plugin, and do not send
+     the user through the OAuth flow. This has happened once already: `agy models`
+     changed from one bare id per line to `id<TAB>Display Name`.
+
    - **default model missing from the model list.** Suggest `agy update`. Do not
      silently switch to a different model — the choice of
      `gemini-3.6-flash-high` is deliberate.
@@ -54,6 +62,9 @@ already contains a per-component status and an ordered remediation list.
 - `agy models` is the readiness probe. It exercises the binary end to end and
   spends no review quota, but it is a *responds* signal, not proof of
   authentication — agy may answer from a cached list. Report it that way.
+- Readiness turns on whether agy answered at all, never on how many models were
+  parsed out of the answer. Only silence means something is wrong with the
+  install.
 - This command checks the toolchain only. For what a review would actually cover
   in the current repository, use `/agy:status`.
 - `--json` emits the same result machine-readably, if you need to branch on it.
