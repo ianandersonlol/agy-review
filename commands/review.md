@@ -58,7 +58,7 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $AR
 
 - Default scope is the working tree vs the merge-base with `origin/HEAD`/`main`/
   `master`, so committed-on-branch **and** uncommitted work are reviewed together.
-- The model is `gemini-3.6-flash-high` and should stay that way. It beats
+- The model is `gemini-3.7-flash-high` and should stay that way. It beats
   `gemini-3.1-pro` on every published coding and agentic benchmark while running
   faster and cheaper, so do not "upgrade" it to a pro model. Do not substitute
   `gpt-oss-120b-medium` (3 confident hallucinations across 2 runs) or a `claude-*`

@@ -48,7 +48,7 @@ already contains a per-component status and an ordered remediation list, headed
 
    - **default model missing from the model list.** Suggest `agy update`. Do not
      silently switch to a different model — the choice of
-     `gemini-3.6-flash-high` is deliberate.
+     `gemini-3.7-flash-high` is deliberate.
 
    - **node too old.** The scripts need Node 18+. Point at <https://nodejs.org>.
 

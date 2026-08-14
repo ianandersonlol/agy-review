@@ -8,7 +8,7 @@ test("defaults to the review subcommand and the defect lens", () => {
   assert.equal(options.subcommand, "review");
   assert.equal(options.lens, "defect");
   assert.equal(options.diffMode, "branch");
-  assert.equal(options.model, "gemini-3.6-flash-high");
+  assert.equal(options.model, "gemini-3.7-flash-high");
 });
 
 test("challenge subcommand selects the design lens", () => {

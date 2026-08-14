@@ -195,7 +195,7 @@ plainly rather than assumed away.
 
 ## Model choice
 
-The reviewer is **`gemini-3.6-flash-high`**, and that is deliberate on two axes.
+The reviewer is **`gemini-3.7-flash-high`**, and that is deliberate on two axes.
 
 **Why Flash over Pro.** It beats `gemini-3.1-pro` on every published coding and
 agentic benchmark — SWE-Bench Pro, DeepSWE, Terminal-Bench, MLE-Bench — with a
@@ -220,7 +220,7 @@ Model diversity therefore lives **across tools, not inside agy**:
 | Tool | Model | Role |
 |---|---|---|
 | Codex CLI plugin | GPT-5.6 | adversarial review, repo-aware |
-| this plugin | Gemini 3.6 Flash | adversarial review, repo-aware |
+| this plugin | Gemini 3.7 Flash | adversarial review, repo-aware |
 | the Claude session | Opus 5 | reconciles, adjudicates, verifies |
 
 Three families, three tools. `--model` overrides per run if you want to test a

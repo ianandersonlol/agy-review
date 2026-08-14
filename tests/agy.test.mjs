@@ -10,9 +10,9 @@ import { remediation, summariseAgy } from "../skills/agy-review/scripts/lib/env.
 
 // Verbatim from `agy models` — the format that broke the original parser.
 const TSV = [
-  "gemini-3.6-flash-high\tGemini 3.6 Flash (High)",
-  "gemini-3.6-flash-medium\tGemini 3.6 Flash (Medium)",
-  "gemini-3.6-flash-low\tGemini 3.6 Flash (Low)",
+  "gemini-3.7-flash-high\tGemini 3.7 Flash (High)",
+  "gemini-3.7-flash-medium\tGemini 3.7 Flash (Medium)",
+  "gemini-3.7-flash-low\tGemini 3.7 Flash (Low)",
   "gemini-3.1-pro-high\tGemini 3.1 Pro (High)",
   "claude-sonnet-4-6\tClaude Sonnet 4.6 (Thinking)",
   "gpt-oss-120b-medium\tGPT-OSS 120B (Medium)",
@@ -30,8 +30,8 @@ test("the id<TAB>display-name format parses", () => {
 });
 
 test("the older bare-id-per-line format still parses", () => {
-  assert.deepEqual(parseModelList("gemini-3.6-flash-high\ngemini-3.1-pro-low\n"), [
-    "gemini-3.6-flash-high",
+  assert.deepEqual(parseModelList("gemini-3.7-flash-high\ngemini-3.1-pro-low\n"), [
+    "gemini-3.7-flash-high",
     "gemini-3.1-pro-low",
   ]);
 });
@@ -39,19 +39,19 @@ test("the older bare-id-per-line format still parses", () => {
 test("decoration around the ids is tolerated", () => {
   const models = parseModelList(
     [
-      "  - gemini-3.6-flash-high   Gemini 3.6 Flash (High)",
+      "  - gemini-3.7-flash-high   Gemini 3.7 Flash (High)",
       "  * gemini-3.1-pro-low",
       "1. claude-opus-4-6-thinking\tClaude Opus 4.6",
       "| gpt-oss-120b-medium | GPT-OSS 120B |",
-      "\u001B[32mgemini-3.6-flash-low\u001B[0m\tGemini 3.6 Flash (Low)",
+      "\u001B[32mgemini-3.7-flash-low\u001B[0m\tGemini 3.7 Flash (Low)",
     ].join("\n"),
   );
   assert.deepEqual(models, [
-    "gemini-3.6-flash-high",
+    "gemini-3.7-flash-high",
     "gemini-3.1-pro-low",
     "claude-opus-4-6-thinking",
     "gpt-oss-120b-medium",
-    "gemini-3.6-flash-low",
+    "gemini-3.7-flash-low",
   ]);
 });
 
@@ -64,11 +64,11 @@ test("prose is not mistaken for a model id", () => {
       "Available models:",
       "ID\tName",
       "",
-      "gemini-3.6-flash-high\tGemini 3.6 Flash (High)",
+      "gemini-3.7-flash-high\tGemini 3.7 Flash (High)",
       "Sign in at https://antigravity.google to continue",
     ].join("\n"),
   );
-  assert.deepEqual(models, ["gemini-3.6-flash-high"]);
+  assert.deepEqual(models, ["gemini-3.7-flash-high"]);
 });
 
 test("lowercase prose shapes that survive the separator rule are still rejected", () => {
@@ -85,15 +85,15 @@ test("lowercase prose shapes that survive the separator rule are still rejected"
 test("a table row does not let a leading status column mask the id", () => {
   // find(Boolean) took the first cell, so "active-ok" would have been the only
   // id parsed out of this row and the real model would have vanished.
-  const models = parseModelList("| active-ok | gemini-3.6-flash-high | Gemini 3.6 Flash |\n");
+  const models = parseModelList("| active-ok | gemini-3.7-flash-high | Gemini 3.7 Flash |\n");
   assert.ok(models.includes(MODEL_DEFAULT), "the real id must survive");
 });
 
 test("a display name never contributes fragments of its own", () => {
-  // "3.6" is lowercase-ish, starts with a digit and contains a separator — it
+  // "3.7" is lowercase-ish, starts with a digit and contains a separator — it
   // only stays out because just the first field of a line is considered.
-  assert.deepEqual(parseModelList("gemini-3.6-flash-high\tGemini 3.6 Flash (High)"), [
-    "gemini-3.6-flash-high",
+  assert.deepEqual(parseModelList("gemini-3.7-flash-high\tGemini 3.7 Flash (High)"), [
+    "gemini-3.7-flash-high",
   ]);
 });
 

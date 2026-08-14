@@ -5,7 +5,7 @@ description: "Delegate code review, design critique, or a fix to Gemini via the 
 
 # Adversarial review via agy (Gemini)
 
-Delegates review of the current diff to `gemini-3.6-flash-high` through the `agy`
+Delegates review of the current diff to `gemini-3.7-flash-high` through the `agy`
 CLI. The reviewer runs **read-only** (`--mode plan --sandbox`) but with read
 access to the whole repository, so it greps for call sites and reads changed
 files in full rather than critiquing a diff in isolation. That is the point of
@@ -108,7 +108,7 @@ that; a half-applied edit is the case the user most needs to see.
 
 ## Do not change the model
 
-`gemini-3.6-flash-high` is deliberate. It beats `gemini-3.1-pro` on every
+`gemini-3.7-flash-high` is deliberate. It beats `gemini-3.1-pro` on every
 published coding and agentic benchmark while being faster and cheaper. Never
 substitute `gpt-oss-120b-medium` (produces confident hallucinations) or a
 `claude-*` model. The whole value here is an *independent* voice, so picking a

@@ -65,5 +65,5 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge 
 - Any incidental bugs it notices are listed in one line at the end under
   "Incidental defects" — that is deliberate, since `/agy:review` is the pass that
   hunts them properly.
-- Same model policy as `/agy:review`: `gemini-3.6-flash-high`, do not change it.
+- Same model policy as `/agy:review`: `gemini-3.7-flash-high`, do not change it.
 - Same quota. Scope large diffs with `-- <paths>`; `--dry-run` spends nothing.

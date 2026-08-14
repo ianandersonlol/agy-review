@@ -2,7 +2,7 @@
 
 import { run, which } from "./exec.mjs";
 
-export const MODEL_DEFAULT = "gemini-3.6-flash-high";
+export const MODEL_DEFAULT = "gemini-3.7-flash-high";
 export const TIMEOUT_DEFAULT = "10m";
 export const ANTIGRAVITY_URL = "https://antigravity.google/download";
 
@@ -20,7 +20,7 @@ export async function agyVersion(agyPath) {
 const ANSI = /\u001B\[[0-9;?]*[ -/]*[@-~]/g;
 // "- id", "* id", "1. id" — list decoration around an otherwise fine id.
 const LIST_MARKER = /^(?:[-*•>]|\d+[.)])\s+/;
-// Model ids are lowercase identifiers: gemini-3.6-flash-high, claude-sonnet-4-6,
+// Model ids are lowercase identifiers: gemini-3.7-flash-high, claude-sonnet-4-6,
 // gpt-oss-120b-medium, and elsewhere shapes like openai/gpt-4o or llama3:8b.
 const MODEL_ID = /^[a-z0-9][a-z0-9._:/-]*$/;
 const SEPARATOR = /[-._:/]/;
@@ -72,7 +72,7 @@ export function parseModelList(stdout) {
 
     // A table row. Which column holds the id is not ours to assume, so every
     // cell is considered: taking only the first would let a leading status or
-    // version column ("| active-ok | gemini-3.6-flash-high |") mask the real id,
+    // version column ("| active-ok | gemini-3.7-flash-high |") mask the real id,
     // and a spare junk entry is much cheaper than a missing real one.
     if (line.startsWith("|")) {
       for (const cell of line.split("|")) {
@@ -84,7 +84,7 @@ export function parseModelList(stdout) {
 
     line = line.replace(LIST_MARKER, "");
     // Only the FIRST field: the rest of the line is the display name, and its
-    // fragments ("3.6") would otherwise pass for ids themselves.
+    // fragments ("3.7") would otherwise pass for ids themselves.
     const first = firstField(line);
     if (looksLikeModelId(first)) ids.add(first);
   }
