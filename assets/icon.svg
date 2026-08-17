@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#818cf8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.6" />
+    </linearGradient>
+
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="40%" stop-color="#818cf8" />
+      <stop offset="70%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="50%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#f093fb" />
+    </linearGradient>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="coreGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="4" />
+
+  <!-- Outer Orbit Glow -->
+  <g transform="translate(256, 256) rotate(-28)">
+    <ellipse cx="0" cy="0" rx="170" ry="76" fill="none" stroke="url(#ringGrad)" stroke-width="6" opacity="0.85" filter="url(#glow)" />
+    <ellipse cx="0" cy="0" rx="170" ry="76" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7" />
+  </g>
+
+  <!-- Secondary Anti-Gravity Ring -->
+  <circle cx="256" cy="256" r="148" fill="none" stroke="url(#starGrad)" stroke-width="3" opacity="0.4" stroke-dasharray="8 6" />
+
+  <!-- Central Antigravity Star Core Glow -->
+  <path d="M 256,96 C 256,180 200,256 116,256 C 200,256 256,332 256,416 C 256,332 312,256 396,256 C 312,256 256,180 256,96 Z"
+        fill="url(#starGrad)" opacity="0.4" filter="url(#glow)" />
+
+  <!-- Central Antigravity Star Solid Body -->
+  <path d="M 256,108 C 256,188 206,256 126,256 C 206,256 256,324 256,404 C 256,324 306,256 386,256 C 306,256 256,188 256,108 Z"
+        fill="url(#starGrad)" filter="url(#coreGlow)" />
+
+  <!-- Inner Sparkle Highlight -->
+  <path d="M 256,140 C 256,204 220,256 156,256 C 220,256 256,308 256,372 C 256,308 292,256 356,256 C 292,256 256,204 256,140 Z"
+        fill="#ffffff" opacity="0.3" />
+
+  <!-- Foreground Arc of Orbit for Depth / 3D Layering -->
+  <g transform="translate(256, 256) rotate(-28)">
+    <path d="M -170,0 A 170,76 0 0,0 170,0" fill="none" stroke="url(#ringGrad)" stroke-width="7" filter="url(#coreGlow)" />
+    <path d="M -160,0 A 160,70 0 0,0 160,0" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.9" />
+  </g>
+</svg>
