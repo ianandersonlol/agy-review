@@ -1,7 +1,7 @@
 ---
 description: Hand a problem to Gemini to diagnose and fix — this one edits your files
 argument-hint: '"<problem statement>" [--read-only] [--no-context] [-- paths...]'
-allowed-tools: Bash(node:*), Bash(git status:*), Bash(git diff:*), Bash(git rev-parse:*), AskUserQuestion
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" rescue:*), Bash(git status:*), Bash(git diff:*), Bash(git rev-parse:*), AskUserQuestion
 ---
 
 Delegate a **problem** to agy, rather than a diff. Gemini reads the repository,
