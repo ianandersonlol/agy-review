@@ -1,6 +1,6 @@
 {
   "name": "agy",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Adversarial code review via agy (Google Antigravity CLI). Runs Gemini 3.8 Flash read-only against your actual repo so it can follow call sites, not just critique a pasted diff.",
   "author": {
     "name": "Ian Anderson",
