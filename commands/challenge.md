@@ -1,7 +1,7 @@
 ---
 description: Challenge the design and approach of your change via agy (Gemini), not its bugs
-argument-hint: [--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]
-allowed-tools: Bash(node:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
+argument-hint: '[--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]'
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
 ---
 
 Ask Gemini whether this change is the **right shape** — not whether it is correct.

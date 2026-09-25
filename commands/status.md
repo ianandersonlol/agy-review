@@ -1,7 +1,7 @@
 ---
 description: Show agy readiness plus exactly what a review would cover right now
 argument-hint: '[--base REF] [--staged] [--uncommitted] [--json] [-- paths...]'
-allowed-tools: Bash(node:*)
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" status:*)
 ---
 
 Show whether the toolchain is ready **and** what a review would send if you ran

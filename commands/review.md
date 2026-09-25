@@ -1,7 +1,7 @@
 ---
 description: Adversarial review of your working diff via agy (Gemini) with real repo access
-argument-hint: [--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]
-allowed-tools: Bash(node:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
+argument-hint: '[--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]'
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
 ---
 
 Get an independent adversarial review of the current change from Gemini via `agy`.

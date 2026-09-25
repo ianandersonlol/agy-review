@@ -1,7 +1,7 @@
 ---
 description: Check that agy, git, and node are ready for reviews, and explain how to fix what is not
 argument-hint: '[--json]'
-allowed-tools: Bash(node:*), Bash(agy install:*), Bash(agy update:*), AskUserQuestion
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup:*), Bash(agy install:*), Bash(agy update:*), AskUserQuestion
 ---
 
 Verify the local toolchain `agy-review` depends on, and give the user a concrete
