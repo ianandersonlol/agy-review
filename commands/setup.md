@@ -46,9 +46,10 @@ already contains a per-component status and an ordered remediation list, headed
      the user through the OAuth flow. This has happened once already: `agy models`
      changed from one bare id per line to `id<TAB>Display Name`.
 
-   - **default model missing from the model list.** Suggest `agy update`. Do not
-     silently switch to a different model — the choice of
-     `gemini-3.8-flash-high` is deliberate.
+   - **default model missing from the model list.** Suggest `agy update` to
+     restore the default. Do not change the plugin default; an orchestrator may
+     choose a listed Carbon model for a difficult review under the review
+     commands' policy.
 
    - **node too old.** The scripts need Node 18+. Point at <https://nodejs.org>.
 
@@ -68,3 +69,5 @@ already contains a per-component status and an ordered remediation list, headed
 - This command checks the toolchain only. For what a review would actually cover
   in the current repository, use `/agy:status`.
 - `--json` emits the same result machine-readably, if you need to branch on it.
+- In JSON output, `environment.agy.models` contains the parsed model IDs when
+  readable. This list indicates availability only, not authorization.

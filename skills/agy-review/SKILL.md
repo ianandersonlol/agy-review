@@ -1,15 +1,17 @@
 ---
 name: agy-review
-description: "Delegate code review, design critique, or a fix to Gemini via the agy (Antigravity) CLI, which runs inside the real repository so it verifies claims against actual call sites rather than a pasted diff. Use when the user asks for an independent second opinion, an adversarial or red-team review, to poke holes in a change, or to check a risky diff before merging; to challenge the design or approach of a change rather than its bugs; or to check that the agy toolchain is set up. It ALSO covers handing agy a problem to fix, which EDITS FILES — invoke that only when the user explicitly asks for agy or Gemini to do the fixing, never as your own first resort for a bug you could fix yourself. Do not invoke unprompted on every change."
+description: "Delegate code review, design critique, or a fix to Gemini via the agy (Antigravity) CLI, which runs inside the real repository so it verifies claims against actual call sites rather than a pasted diff. Uses Gemini 3.8 Flash by default and can select Gemini 4 Carbon for difficult reviews when available. Use when the user asks for an independent second opinion, an adversarial or red-team review, to poke holes in a change, or to check a risky diff before merging; to challenge the design or approach of a change rather than its bugs; or to check that the agy toolchain is set up. It ALSO covers handing agy a problem to fix, which EDITS FILES — invoke that only when the user explicitly asks for agy or Gemini to do the fixing, never as your own first resort for a bug you could fix yourself. Do not invoke unprompted on every change."
 ---
 
 # Adversarial review via agy (Gemini)
 
-Delegates review of the current diff to `gemini-3.8-flash-high` through the `agy`
-CLI. The reviewer runs **read-only** (`--mode plan --sandbox`) but with read
-access to the whole repository, so it greps for call sites and reads changed
-files in full rather than critiquing a diff in isolation. That is the point of
-this skill: it catches breakage in files the diff never touched.
+Delegates review of the current diff to Gemini through the `agy` CLI. The
+default is `gemini-3.8-flash-high`; difficult reviews may use a listed Gemini 4
+Carbon model as described below. The reviewer runs **read-only**
+(`--mode plan --sandbox`) but with read access to the whole repository, so it
+greps for call sites and reads changed files in full rather than critiquing a
+diff in isolation. That is the point of this skill: it catches breakage in files
+the diff never touched.
 
 ## Running it
 
@@ -48,6 +50,7 @@ it is for "fix this", not "check this".
 --staged          staged changes only
 --uncommitted     uncommitted only (vs HEAD)
 --lens defect|design  override the lens the subcommand picked
+--model ID         choose one agy model for this run (default: Gemini 3.8 Flash)
 --focus "TEXT"    steer the reviewer, e.g. --focus "auth and data loss"
 -- <paths>        scope a large diff to specific paths
 --dry-run         show what would be reviewed; spends no quota
@@ -106,13 +109,37 @@ never attributes the user's own uncommitted work to agy. Your job:
 If agy edited files and then failed, the diff is still printed. Always surface
 that; a half-applied edit is the case the user most needs to see.
 
-## Do not change the model
+## Model choice
 
-`gemini-3.8-flash-high` is deliberate. It beats `gemini-3.1-pro` on every
-published coding and agentic benchmark while being faster and cheaper. Never
-substitute `gpt-oss-120b-medium` (produces confident hallucinations) or a
-`claude-*` model. The whole value here is an *independent* voice, so picking a
-model from the same family as the agent driving the review defeats the purpose.
+Use `gemini-3.8-flash-high` for normal, small, and routine reviews. For a
+difficult review involving multi-subsystem reasoning, concurrency or security
+invariants, architectural tradeoffs, or an inconclusive successful Flash review,
+prefer Gemini 4 Carbon when listed (access depends on the user's plan).
+
+Before selecting Carbon, run:
+
+```bash
+node scripts/agy-review.mjs setup --json
+```
+
+Read the exact identifiers in `environment.agy.models`. Pass the listed
+identifier as `--model`; do not guess an ID or presumed suffix. A listed model
+is an availability signal, not proof of authorization. If Carbon is not listed
+or the optional probe fails or is unreadable, keep Flash and briefly disclose
+that choice; this is not a readiness gate, so let the original review invocation
+or challenge invocation handle its errors. An explicit user-supplied `--model` is passed through
+unchanged and skips probing. `--dry-run` also needs no probe. When selecting
+Carbon without an explicit `--model`, preserve all user arguments and insert
+`--model <exact-listed-id>` before any `--` path separator.
+
+This selection is an orchestration instruction, not runtime model routing: a
+direct script run defaults to Flash. A separate Carbon review is reasonable
+after a successful but inconclusive Flash result. Do not retry or fall back
+after quota, auth, or empty-output failures; surface the existing error. Rescue
+always keeps the Flash default and is not automatically escalated.
+
+The reviewer remains an independent Gemini voice relative to the host agent;
+do not substitute a model from the host agent's family.
 
 ## Exit codes — check before interpreting output
 

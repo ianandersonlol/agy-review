@@ -11,6 +11,14 @@ test("defaults to the review subcommand and the defect lens", () => {
   assert.equal(options.model, "gemini-3.8-flash-high");
 });
 
+test("--model preserves an explicit Carbon-like identifier", () => {
+  // Synthetic test ID; this is not a verified agy product identifier.
+  assert.equal(
+    parseArgs(["review", "--model", "synthetic-carbon-id"]).model,
+    "synthetic-carbon-id",
+  );
+});
+
 test("challenge subcommand selects the design lens", () => {
   assert.equal(parseArgs(["challenge"]).lens, "design");
 });

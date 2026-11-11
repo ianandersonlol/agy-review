@@ -1,7 +1,7 @@
 ---
 description: Challenge the design and approach of your change via agy (Gemini), not its bugs
 argument-hint: '[--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]'
-allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge:*), Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
 ---
 
 Ask Gemini whether this change is the **right shape** — not whether it is correct.
@@ -15,6 +15,34 @@ same class of problem.
 
 Arguments: $ARGUMENTS
 
+## Model choice
+
+Use `gemini-3.8-flash-high` for normal, small, and routine challenges. For a
+difficult review involving multi-subsystem reasoning, concurrency or security
+invariants, architectural tradeoffs, or an inconclusive successful Flash result,
+prefer Gemini 4 Carbon when listed (access depends on the user's plan). Before
+selecting Carbon, run:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --json
+```
+
+Read the exact identifiers in `environment.agy.models`; pass the listed ID using
+`--model`. Do not guess an ID or presumed suffix. A listed model is an
+availability signal, not proof of authorization. If Carbon is absent or the
+optional probe fails or is unreadable, keep Flash and briefly disclose that
+choice; this is not a readiness gate, so let the original challenge invocation
+handle its errors.
+
+Pass any explicit user-supplied `--model` unchanged and skip model probing.
+`--dry-run` needs no probe. This is orchestration guidance, not runtime routing:
+direct script runs default to Flash. Do not retry or fall back after quota, auth,
+or empty-output failures; report them using the existing behavior. A successful
+but inconclusive Flash result may warrant a separate Carbon challenge. Preserve
+every user argument. Only when choosing Carbon with no explicit `--model`,
+insert `--model <exact-listed-id>` before any `--` path separator (or append it
+if there is no separator); do not alter other arguments.
+
 ## When this is the right command
 
 Reach for it on a new subsystem, an architectural decision, a change that adds a
@@ -27,7 +55,8 @@ produce disjoint verdict vocabularies so the two reviews never blur together.
 
 ## Steps
 
-1. Run the challenge. Pass `$ARGUMENTS` straight through:
+1. Run the challenge, preserving every user argument. Follow the model-choice
+   instructions above; only the documented Carbon override may be inserted:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge $ARGUMENTS
@@ -65,5 +94,6 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge 
 - Any incidental bugs it notices are listed in one line at the end under
   "Incidental defects" — that is deliberate, since `/agy:review` is the pass that
   hunts them properly.
-- Same model policy as `/agy:review`: `gemini-3.8-flash-high`, do not change it.
+- Same model policy as `/agy:review`: Flash by default, Carbon only for a
+  difficult review when its exact ID is listed by `setup --json`.
 - Same quota. Scope large diffs with `-- <paths>`; `--dry-run` spends nothing.
