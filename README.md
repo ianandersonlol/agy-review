@@ -195,38 +195,38 @@ plainly rather than assumed away.
 
 ## Model choice
 
-The reviewer is **`gemini-3.8-flash-high`**, and that is deliberate on two axes.
+The default is **`gemini-3.8-flash-high`**. Use it for normal, small, and
+routine reviews. For a difficult review involving multi-subsystem reasoning,
+concurrency or security invariants, architectural tradeoffs, or an inconclusive
+Flash review, prefer Gemini 4 Carbon when listed (access depends on the user's
+plan). Ultra and Enterprise are plan names, not model variants; see the
+[official model documentation](https://antigravity.google/docs/models.md).
 
-**Why Flash over Pro.** Flash-high beats `gemini-3.1-pro` on every published
-coding and agentic benchmark — SWE-Bench Pro, DeepSWE, Terminal-Bench,
-MLE-Bench — with a higher Artificial Analysis intelligence index, and runs
-several times faster and cheaper. On the 3.7 generation, where the comparison
-was first made here, that gap was 50 vs 46 on the index and ~2.3x on speed.
-Pro's only remaining leads are GPQA Diamond and Humanity's Last Exam: academic
-reasoning that code review does not need. **Do not "upgrade" this to a pro
-model.**
+The host agent checks the exact model identifiers with the existing
+`setup --json` command and passes the listed identifier through `--model`. Do
+not guess an identifier or append a presumed suffix: the model list is an
+availability signal, not a guarantee of authorization. If Carbon is absent, or
+the list is unavailable or unreadable, keep Flash and briefly disclose that
+choice. An explicit `--model` is always passed through unchanged and does not
+trigger a model-list probe. `--dry-run` also does not need a probe.
 
-**Why no second model inside agy.** agy exposes three families and neither
-non-Gemini option earns a seat:
+This is an instruction-led choice, not runtime routing: direct script runs keep
+the Flash default unless `--model` is supplied. A deliberate Carbon follow-up
+may be made after a successful but inconclusive Flash review; quota, auth, and
+empty-output failures are surfaced as they are, with no retry or fallback.
+`rescue` keeps the Flash default and is never automatically escalated.
 
-- `gpt-oss-120b-medium` produced **3 confident hallucinations across 2 runs** on
-  this codebase, all labelled VERIFIED: a nonexistent indentation error; a claim
-  the scripts use `>2` when they use `>&2` 18 times and bare `>2` zero times; and
-  a claim that `"${arr[@]}"` word-splits. Anecdote, not a benchmark — but a
-  confident false finding costs more review time than no finding at all.
-- `claude-*` correlates with the Claude session driving the review, so it adds
-  little independence — which is the entire point of a second opinion.
-
-Model diversity therefore lives **across tools, not inside agy**:
+The plugin remains one independent Gemini reviewer per invocation, rather than
+a multi-provider council:
 
 | Tool | Model | Role |
 |---|---|---|
 | Codex CLI plugin | GPT-5.6 | adversarial review, repo-aware |
-| this plugin | Gemini 3.8 Flash | adversarial review, repo-aware |
+| this plugin | Gemini 3.8 Flash by default; Carbon for difficult reviews when listed | adversarial review, repo-aware |
 | the Claude session | Opus 5 | reconciles, adjudicates, verifies |
 
-Three families, three tools. `--model` overrides per run if you want to test a
-different one; `/agy:setup` lists what your agy build actually offers.
+`--model` overrides the choice for one run; `/agy:setup` lists what your agy
+build actually offers. There is no parallel panel or internal voting.
 
 ## The leash
 
@@ -298,11 +298,11 @@ enforces that.
 
 ## Scope: one voice, not a council
 
-This plugin is deliberately **one reviewer**, not a panel. Convening a council is
-the orchestrating Claude session's job — it delegates to agy for the Gemini voice
-and to the Codex plugin for the GPT voice, then reconciles. Building a council
-inside a single-provider plugin would just fan out to models from the same
-provider, which is the opposite of what a council is for.
+This plugin is deliberately **one reviewer per invocation**, not a panel.
+Convening a council is the orchestrating Claude session's job — it delegates to
+agy for the Gemini voice and to the Codex plugin for the GPT voice, then
+reconciles. A difficult review may choose Carbon instead of Flash, but never
+runs an internal panel or votes across models.
 
 So: no `--models`, no parallel panel, no internal voting. One diff, one
 independent reviewer, honest output.

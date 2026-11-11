@@ -29,6 +29,13 @@ test("the id<TAB>display-name format parses", () => {
   assert.ok(models.every((id) => !id.includes("\t") && !id.includes(" ")));
 });
 
+test("a synthetic Carbon identifier is parsed without assuming a product ID", () => {
+  const models = parseModelList(
+    "synthetic-carbon-id\tGemini 4 Carbon (synthetic test fixture)\n",
+  );
+  assert.deepEqual(models, ["synthetic-carbon-id"]);
+});
+
 test("the older bare-id-per-line format still parses", () => {
   assert.deepEqual(parseModelList("gemini-3.8-flash-high\ngemini-3.1-pro-low\n"), [
     "gemini-3.8-flash-high",

@@ -1,7 +1,7 @@
 ---
 description: Adversarial review of your working diff via agy (Gemini) with real repo access
 argument-hint: '[--base REF] [--staged] [--uncommitted] [--focus "TEXT"] [--model ID] [-- paths...]'
-allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
+allowed-tools: Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review:*), Bash(node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup:*), Bash(git status:*), Bash(git rev-parse:*), Bash(git diff --stat:*)
 ---
 
 Get an independent adversarial review of the current change from Gemini via `agy`.
@@ -14,9 +14,38 @@ and approach instead, use `/agy:challenge`.
 
 Arguments: $ARGUMENTS
 
+## Model choice
+
+Use `gemini-3.8-flash-high` for normal, small, and routine reviews. For a
+difficult review involving multi-subsystem reasoning, concurrency or security
+invariants, architectural tradeoffs, or an inconclusive successful Flash review,
+prefer Gemini 4 Carbon when listed (access depends on the user's plan). Before
+selecting Carbon, run:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --json
+```
+
+Read the exact identifiers in `environment.agy.models`; pass the listed ID using
+`--model`. Do not guess an ID or presumed suffix. A listed model is an
+availability signal, not proof of authorization. If Carbon is absent or the
+optional probe fails or is unreadable, keep Flash and briefly disclose that
+choice; this is not a readiness gate, so let the original review invocation
+handle its errors.
+
+Pass any explicit user-supplied `--model` unchanged and skip model probing.
+`--dry-run` needs no probe. This is orchestration guidance, not runtime routing:
+direct script runs default to Flash. Do not retry or fall back after quota, auth,
+or empty-output failures; report them using the existing behavior. A successful
+but inconclusive Flash result may warrant a separate Carbon review. Preserve
+every user argument. Only when choosing Carbon with no explicit `--model`,
+insert `--model <exact-listed-id>` before any `--` path separator (or append it
+if there is no separator); do not alter other arguments.
+
 ## Steps
 
-1. Run the review. Pass `$ARGUMENTS` straight through — the script parses them:
+1. Run the review, preserving every user argument. Follow the model-choice
+   instructions above; only the documented Carbon override may be inserted:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $ARGUMENTS
@@ -58,11 +87,8 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $AR
 
 - Default scope is the working tree vs the merge-base with `origin/HEAD`/`main`/
   `master`, so committed-on-branch **and** uncommitted work are reviewed together.
-- The model is `gemini-3.8-flash-high` and should stay that way. It beats
-  `gemini-3.1-pro` on every published coding and agentic benchmark while running
-  faster and cheaper, so do not "upgrade" it to a pro model. Do not substitute
-  `gpt-oss-120b-medium` (3 confident hallucinations across 2 runs) or a `claude-*`
-  model (correlates with you, so it is not an independent voice).
+- Keep the Flash default for routine reviews; Carbon is a per-review choice only
+  for difficult reviews when its exact ID is listed by `setup --json`.
 - **This command is one voice, not a council.** If the user wants a council,
   that is your job as the orchestrator: run this for the Gemini opinion, run the
   Codex plugin's adversarial review for the GPT opinion, then reconcile the two

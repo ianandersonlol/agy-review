@@ -274,3 +274,41 @@ test("runReview refuses an unrecognised mode outright", async () => {
     /unrecognised mode/,
   );
 });
+
+test("review and challenge pass the selected model without weakening the read-only leash", {
+  skip: process.platform === "win32" ? "test shim uses a POSIX executable" : false,
+}, async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "agy-model-test-"));
+  const captureFile = path.join(dir, "args.json");
+  const fakeAgy = path.join(dir, "agy");
+  const model = "synthetic-carbon-id";
+  const script = [
+    "#!/usr/bin/env node",
+    "const fs = require('node:fs');",
+    `fs.writeFileSync(${JSON.stringify(captureFile)}, JSON.stringify(process.argv.slice(2)));`,
+    "process.stdout.write('review output');",
+    "",
+  ].join("\n");
+
+  try {
+    await fs.writeFile(fakeAgy, script, { mode: 0o700 });
+    for (const caller of ["review", "challenge"]) {
+      const result = await runReview({
+        agyPath: fakeAgy,
+        repoRoot: dir,
+        workDir: dir,
+        requestFile: path.join(dir, "request.md"),
+        model,
+        printTimeout: "10m",
+        mode: resolveMode(caller, false),
+      });
+      assert.equal(result.code, 0, result.stderr);
+      const argv = JSON.parse(await fs.readFile(captureFile, "utf8"));
+      assert.equal(argv[argv.indexOf("--model") + 1], model);
+      assert.deepEqual(argv.slice(argv.indexOf("--mode"), argv.indexOf("--mode") + 2), ["--mode", "plan"]);
+      assert.ok(argv.includes("--sandbox"));
+    }
+  } finally {
+    await cleanup(dir);
+  }
+});
