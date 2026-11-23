@@ -16,11 +16,22 @@ Arguments: $ARGUMENTS
 
 ## Model choice
 
-Use `gemini-3.8-flash-high` for normal, small, and routine reviews. For a
-difficult review involving multi-subsystem reasoning, concurrency or security
-invariants, architectural tradeoffs, or an inconclusive successful Flash review,
-prefer Gemini 4 Carbon when listed (access depends on the user's plan). Before
-selecting Carbon, run:
+The default is `gemini-4-neon-high` (Gemini 4 Neon). Use it for normal reviews.
+Any model agy lists can be chosen instead with `--model`: the script passes the
+identifier through unchanged and never restricts it to a known set. As of
+November 2026 the Gemini 4 family in agy is:
+
+- **Neon** — the balanced default (`low`/`medium`/`high`/`xhigh` effort).
+- **Hydrogen** — faster and cheaper; a good fit for small or routine reviews
+  (`low`/`medium`/`high`/`xhigh`).
+- **Carbon** — the strongest; prefer it for a difficult review involving
+  multi-subsystem reasoning, concurrency or security invariants, architectural
+  tradeoffs, or an inconclusive successful Neon result (`low`/`medium`/`high`;
+  access depends on the user's plan).
+
+agy encodes effort in the identifier itself (for example `gemini-4-neon-xhigh`),
+and older models such as Gemini 3.8 Flash remain selectable while agy lists
+them. Before selecting anything other than the default, run:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --json
@@ -28,24 +39,24 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --js
 
 Read the exact identifiers in `environment.agy.models`; pass the listed ID using
 `--model`. Do not guess an ID or presumed suffix. A listed model is an
-availability signal, not proof of authorization. If Carbon is absent or the
-optional probe fails or is unreadable, keep Flash and briefly disclose that
-choice; this is not a readiness gate, so let the original review invocation
-handle its errors.
+availability signal, not proof of authorization. If the model you wanted is
+absent or the optional probe fails or is unreadable, keep the default and
+briefly disclose that choice; this is not a readiness gate, so let the original
+review invocation handle its errors.
 
 Pass any explicit user-supplied `--model` unchanged and skip model probing.
 `--dry-run` needs no probe. This is orchestration guidance, not runtime routing:
-direct script runs default to Flash. Do not retry or fall back after quota, auth,
+direct script runs default to Neon. Do not retry or fall back after quota, auth,
 or empty-output failures; report them using the existing behavior. A successful
-but inconclusive Flash result may warrant a separate Carbon review. Preserve
-every user argument. Only when choosing Carbon with no explicit `--model`,
-insert `--model <exact-listed-id>` before any `--` path separator (or append it
-if there is no separator); do not alter other arguments.
+but inconclusive Neon result may warrant a separate Carbon review. Preserve
+every user argument. Only when choosing a non-default model with no explicit
+`--model`, insert `--model <exact-listed-id>` before any `--` path separator (or
+append it if there is no separator); do not alter other arguments.
 
 ## Steps
 
 1. Run the review, preserving every user argument. Follow the model-choice
-   instructions above; only the documented Carbon override may be inserted:
+   instructions above; only the documented `--model` override may be inserted:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $ARGUMENTS
@@ -87,8 +98,9 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" review $AR
 
 - Default scope is the working tree vs the merge-base with `origin/HEAD`/`main`/
   `master`, so committed-on-branch **and** uncommitted work are reviewed together.
-- Keep the Flash default for routine reviews; Carbon is a per-review choice only
-  for difficult reviews when its exact ID is listed by `setup --json`.
+- Keep the Neon default for ordinary reviews; Hydrogen (lighter) and Carbon
+  (difficult reviews) are per-review choices, and only when their exact ID is
+  listed by `setup --json`. A user-supplied `--model` always wins.
 - **This command is one voice, not a council.** If the user wants a council,
   that is your job as the orchestrator: run this for the Gemini opinion, run the
   Codex plugin's adversarial review for the GPT opinion, then reconcile the two

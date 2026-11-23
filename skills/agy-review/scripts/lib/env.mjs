@@ -128,7 +128,7 @@ export function remediation(environment) {
   } else if (environment.agy.defaultModelAvailable === false) {
     steps.push({
       problem: `The default model ${MODEL_DEFAULT} is not in this agy build's model list.`,
-      fix: "Run `agy update`, or pass --model with one of the listed models.",
+      fix: "Run `agy update` (access can also depend on your plan), or pass --model with one of the listed models.",
     });
   }
   if (environment.repo && !environment.repo.ok) {

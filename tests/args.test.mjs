@@ -8,7 +8,7 @@ test("defaults to the review subcommand and the defect lens", () => {
   assert.equal(options.subcommand, "review");
   assert.equal(options.lens, "defect");
   assert.equal(options.diffMode, "branch");
-  assert.equal(options.model, "gemini-3.8-flash-high");
+  assert.equal(options.model, "gemini-4-neon-high");
 });
 
 test("--model preserves an explicit Carbon-like identifier", () => {

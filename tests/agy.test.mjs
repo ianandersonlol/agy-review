@@ -10,6 +10,7 @@ import { remediation, summariseAgy } from "../skills/agy-review/scripts/lib/env.
 
 // Verbatim from `agy models` — the format that broke the original parser.
 const TSV = [
+  "gemini-4-neon-high\tGemini 4 Neon (High)",
   "gemini-3.8-flash-high\tGemini 3.8 Flash (High)",
   "gemini-3.8-flash-medium\tGemini 3.8 Flash (Medium)",
   "gemini-3.8-flash-low\tGemini 3.8 Flash (Low)",
@@ -23,7 +24,7 @@ test("the id<TAB>display-name format parses", () => {
   // The regression: every display name contains spaces, the old parser dropped
   // every line containing a space, and a working install looked unauthenticated.
   const models = parseModelList(TSV);
-  assert.equal(models.length, 6);
+  assert.equal(models.length, 7);
   assert.ok(models.includes(MODEL_DEFAULT));
   assert.ok(models.includes("claude-sonnet-4-6"));
   assert.ok(models.every((id) => !id.includes("\t") && !id.includes(" ")));
@@ -34,6 +35,19 @@ test("a synthetic Carbon identifier is parsed without assuming a product ID", ()
     "synthetic-carbon-id\tGemini 4 Carbon (synthetic test fixture)\n",
   );
   assert.deepEqual(models, ["synthetic-carbon-id"]);
+});
+
+test("the Gemini 4 family parses at every effort level", () => {
+  const ids = [
+    "gemini-4-neon-high", "gemini-4-neon-xhigh", "gemini-4-neon-medium", "gemini-4-neon-low",
+    "gemini-4-hydrogen-high", "gemini-4-hydrogen-xhigh", "gemini-4-hydrogen-medium",
+    "gemini-4-hydrogen-low",
+    "gemini-4-carbon-high", "gemini-4-carbon-medium", "gemini-4-carbon-low",
+    "gemini-pro-orchestrator-neon",
+  ];
+  const listing = ids.map((id) => `${id}\tGemini 4 Something (XHigh)`).join("\n");
+  assert.deepEqual(parseModelList(listing), ids);
+  assert.ok(ids.includes(MODEL_DEFAULT), "the default is a Neon id");
 });
 
 test("the older bare-id-per-line format still parses", () => {
@@ -92,7 +106,7 @@ test("lowercase prose shapes that survive the separator rule are still rejected"
 test("a table row does not let a leading status column mask the id", () => {
   // find(Boolean) took the first cell, so "active-ok" would have been the only
   // id parsed out of this row and the real model would have vanished.
-  const models = parseModelList("| active-ok | gemini-3.8-flash-high | Gemini 3.8 Flash |\n");
+  const models = parseModelList("| active-ok | gemini-4-neon-high | Gemini 4 Neon |\n");
   assert.ok(models.includes(MODEL_DEFAULT), "the real id must survive");
 });
 

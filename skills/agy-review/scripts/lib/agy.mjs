@@ -2,7 +2,7 @@
 
 import { run, which } from "./exec.mjs";
 
-export const MODEL_DEFAULT = "gemini-3.8-flash-high";
+export const MODEL_DEFAULT = "gemini-4-neon-high";
 export const TIMEOUT_DEFAULT = "10m";
 export const ANTIGRAVITY_URL = "https://antigravity.google/download";
 
@@ -20,8 +20,9 @@ export async function agyVersion(agyPath) {
 const ANSI = /\u001B\[[0-9;?]*[ -/]*[@-~]/g;
 // "- id", "* id", "1. id" — list decoration around an otherwise fine id.
 const LIST_MARKER = /^(?:[-*•>]|\d+[.)])\s+/;
-// Model ids are lowercase identifiers: gemini-3.8-flash-high, claude-sonnet-4-6,
-// gpt-oss-120b-medium, and elsewhere shapes like openai/gpt-4o or llama3:8b.
+// Model ids are lowercase identifiers: gemini-4-neon-high, gemini-4-hydrogen-xhigh,
+// gemini-3.8-flash-high, claude-sonnet-5-5-high, gpt-oss-120b-medium, and
+// elsewhere shapes like openai/gpt-4o or llama3:8b.
 const MODEL_ID = /^[a-z0-9][a-z0-9._:/-]*$/;
 const SEPARATOR = /[-._:/]/;
 const URL_SCHEME = /:\/\//;

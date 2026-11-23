@@ -195,26 +195,42 @@ plainly rather than assumed away.
 
 ## Model choice
 
-The default is **`gemini-3.8-flash-high`**. Use it for normal, small, and
-routine reviews. For a difficult review involving multi-subsystem reasoning,
-concurrency or security invariants, architectural tradeoffs, or an inconclusive
-Flash review, prefer Gemini 4 Carbon when listed (access depends on the user's
-plan). Ultra and Enterprise are plan names, not model variants; see the
+The default is **`gemini-4-neon-high`** (Gemini 4 Neon). Any model your agy
+build lists can be used instead: `--model ID` is passed to agy unchanged and is
+never checked against a built-in list, so new models work the day agy ships
+them. As of November 2026 the Gemini 4 family in agy looks like this:
+
+| Model | Example IDs | Use it for |
+|---|---|---|
+| Gemini 4 Neon | `gemini-4-neon-{low,medium,high,xhigh}` | the default; ordinary reviews |
+| Gemini 4 Hydrogen | `gemini-4-hydrogen-{low,medium,high,xhigh}` | fast, cheap, routine reviews |
+| Gemini 4 Carbon | `gemini-4-carbon-{low,medium,high}` | difficult reviews: multi-subsystem reasoning, concurrency or security invariants, architectural tradeoffs |
+
+agy encodes reasoning effort in the identifier, and which models you can use
+depends on your plan and sign-in method. Older models such as
+`gemini-3.8-flash-high` stay selectable for as long as agy lists them. Run
+`agy models` or `/agy:setup` for the authoritative list; see also the
 [official model documentation](https://antigravity.google/docs/models.md).
 
-The host agent checks the exact model identifiers with the existing
-`setup --json` command and passes the listed identifier through `--model`. Do
-not guess an identifier or append a presumed suffix: the model list is an
-availability signal, not a guarantee of authorization. If Carbon is absent, or
-the list is unavailable or unreadable, keep Flash and briefly disclose that
-choice. An explicit `--model` is always passed through unchanged and does not
-trigger a model-list probe. `--dry-run` also does not need a probe.
+```bash
+node skills/agy-review/scripts/agy-review.mjs review --model gemini-4-carbon-high
+node skills/agy-review/scripts/agy-review.mjs review --model gemini-4-hydrogen-medium
+```
+
+When the host agent picks a non-default model on its own (typically Carbon for a
+difficult review, or after a successful but inconclusive Neon review), it first
+checks the exact identifiers with `setup --json` and passes the listed
+identifier through `--model`. It does not guess an identifier or append a
+presumed suffix: the model list is an availability signal, not a guarantee of
+authorization. If the wanted model is absent, or the list is unavailable or
+unreadable, it keeps the default and briefly discloses that choice. An explicit
+`--model` from you is always passed through unchanged and does not trigger a
+model-list probe. `--dry-run` also does not need a probe.
 
 This is an instruction-led choice, not runtime routing: direct script runs keep
-the Flash default unless `--model` is supplied. A deliberate Carbon follow-up
-may be made after a successful but inconclusive Flash review; quota, auth, and
-empty-output failures are surfaced as they are, with no retry or fallback.
-`rescue` keeps the Flash default and is never automatically escalated.
+the Neon default unless `--model` is supplied. Quota, auth, and empty-output
+failures are surfaced as they are, with no retry or fallback. `rescue` keeps the
+default unless you pass `--model` and is never automatically switched.
 
 The plugin remains one independent Gemini reviewer per invocation, rather than
 a multi-provider council:
@@ -222,7 +238,7 @@ a multi-provider council:
 | Tool | Model | Role |
 |---|---|---|
 | Codex CLI plugin | GPT-5.6 | adversarial review, repo-aware |
-| this plugin | Gemini 3.8 Flash by default; Carbon for difficult reviews when listed | adversarial review, repo-aware |
+| this plugin | Gemini 4 Neon by default; any listed model via `--model` | adversarial review, repo-aware |
 | the Claude session | Opus 5 | reconciles, adjudicates, verifies |
 
 `--model` overrides the choice for one run; `/agy:setup` lists what your agy
@@ -301,7 +317,7 @@ enforces that.
 This plugin is deliberately **one reviewer per invocation**, not a panel.
 Convening a council is the orchestrating Claude session's job — it delegates to
 agy for the Gemini voice and to the Codex plugin for the GPT voice, then
-reconciles. A difficult review may choose Carbon instead of Flash, but never
+reconciles. A review may choose Carbon or Hydrogen instead of Neon, but never
 runs an internal panel or votes across models.
 
 So: no `--models`, no parallel panel, no internal voting. One diff, one

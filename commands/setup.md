@@ -46,10 +46,11 @@ already contains a per-component status and an ordered remediation list, headed
      the user through the OAuth flow. This has happened once already: `agy models`
      changed from one bare id per line to `id<TAB>Display Name`.
 
-   - **default model missing from the model list.** Suggest `agy update` to
-     restore the default. Do not change the plugin default; an orchestrator may
-     choose a listed Carbon model for a difficult review under the review
-     commands' policy.
+   - **default model missing from the model list.** The default is Gemini 4 Neon
+     (`gemini-4-neon-high`), which needs a recent agy build and may depend on the
+     user's plan. Suggest `agy update`; if Neon is still not listed, reviews
+     work with any listed model passed as `--model` (for example a Hydrogen or
+     Flash ID from the list). Do not change the plugin default.
 
    - **node too old.** The scripts need Node 18+. Point at <https://nodejs.org>.
 

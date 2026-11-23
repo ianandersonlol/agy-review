@@ -17,11 +17,22 @@ Arguments: $ARGUMENTS
 
 ## Model choice
 
-Use `gemini-3.8-flash-high` for normal, small, and routine challenges. For a
-difficult review involving multi-subsystem reasoning, concurrency or security
-invariants, architectural tradeoffs, or an inconclusive successful Flash result,
-prefer Gemini 4 Carbon when listed (access depends on the user's plan). Before
-selecting Carbon, run:
+The default is `gemini-4-neon-high` (Gemini 4 Neon). Use it for normal challenges.
+Any model agy lists can be chosen instead with `--model`: the script passes the
+identifier through unchanged and never restricts it to a known set. As of
+November 2026 the Gemini 4 family in agy is:
+
+- **Neon** — the balanced default (`low`/`medium`/`high`/`xhigh` effort).
+- **Hydrogen** — faster and cheaper; a good fit for small or routine challenges
+  (`low`/`medium`/`high`/`xhigh`).
+- **Carbon** — the strongest; prefer it for a difficult challenge involving
+  multi-subsystem reasoning, concurrency or security invariants, architectural
+  tradeoffs, or an inconclusive successful Neon result (`low`/`medium`/`high`;
+  access depends on the user's plan).
+
+agy encodes effort in the identifier itself (for example `gemini-4-neon-xhigh`),
+and older models such as Gemini 3.8 Flash remain selectable while agy lists
+them. Before selecting anything other than the default, run:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --json
@@ -29,19 +40,19 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" setup --js
 
 Read the exact identifiers in `environment.agy.models`; pass the listed ID using
 `--model`. Do not guess an ID or presumed suffix. A listed model is an
-availability signal, not proof of authorization. If Carbon is absent or the
-optional probe fails or is unreadable, keep Flash and briefly disclose that
-choice; this is not a readiness gate, so let the original challenge invocation
-handle its errors.
+availability signal, not proof of authorization. If the model you wanted is
+absent or the optional probe fails or is unreadable, keep the default and
+briefly disclose that choice; this is not a readiness gate, so let the original
+challenge invocation handle its errors.
 
 Pass any explicit user-supplied `--model` unchanged and skip model probing.
 `--dry-run` needs no probe. This is orchestration guidance, not runtime routing:
-direct script runs default to Flash. Do not retry or fall back after quota, auth,
+direct script runs default to Neon. Do not retry or fall back after quota, auth,
 or empty-output failures; report them using the existing behavior. A successful
-but inconclusive Flash result may warrant a separate Carbon challenge. Preserve
-every user argument. Only when choosing Carbon with no explicit `--model`,
-insert `--model <exact-listed-id>` before any `--` path separator (or append it
-if there is no separator); do not alter other arguments.
+but inconclusive Neon result may warrant a separate Carbon challenge. Preserve
+every user argument. Only when choosing a non-default model with no explicit
+`--model`, insert `--model <exact-listed-id>` before any `--` path separator (or
+append it if there is no separator); do not alter other arguments.
 
 ## When this is the right command
 
@@ -56,7 +67,7 @@ produce disjoint verdict vocabularies so the two reviews never blur together.
 ## Steps
 
 1. Run the challenge, preserving every user argument. Follow the model-choice
-   instructions above; only the documented Carbon override may be inserted:
+   instructions above; only the documented `--model` override may be inserted:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge $ARGUMENTS
@@ -94,6 +105,7 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/agy-review/scripts/agy-review.mjs" challenge 
 - Any incidental bugs it notices are listed in one line at the end under
   "Incidental defects" — that is deliberate, since `/agy:review` is the pass that
   hunts them properly.
-- Same model policy as `/agy:review`: Flash by default, Carbon only for a
-  difficult review when its exact ID is listed by `setup --json`.
+- Same model policy as `/agy:review`: Neon by default, any listed model via
+  `--model`, Carbon for a difficult challenge when its exact ID is listed by
+  `setup --json`.
 - Same quota. Scope large diffs with `-- <paths>`; `--dry-run` spends nothing.

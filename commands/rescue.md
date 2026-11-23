@@ -75,5 +75,5 @@ half-applied edit is exactly the situation the user must know about.
 - agy is told never to touch git history, never to weaken a test into passing,
   and to make the smallest change that fixes the problem. Those are prompt-level
   constraints, not enforced ones — which is why you review the diff.
-- Rescue keeps the `gemini-3.8-flash-high` default and honors an explicit
-  `--model` override. Do not automatically escalate writing runs to Carbon.
+- Rescue keeps the `gemini-4-neon-high` default and honors any explicit
+  `--model` override. Do not automatically switch writing runs to another model.
